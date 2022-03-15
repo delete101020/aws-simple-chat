@@ -1,4 +1,4 @@
-import { verify } from 'jsonwebtoken';
+import { JwtPayload, verify } from 'jsonwebtoken';
 import { ClaimVerifyRequest, ClaimVerifyResult } from '@core/constants';
 import { VerifyStrategy } from './verifier';
 
@@ -10,8 +10,12 @@ export class JwtVerifier implements VerifyStrategy {
   }
 
   async verify(request: ClaimVerifyRequest): Promise<ClaimVerifyResult> {
-    const payload = verify(request.token, this._secret);
+    try {
+      const payload = verify(request.token, this._secret);
 
-    return payload as ClaimVerifyResult;
+      return { isValid: true, ...(payload as JwtPayload) } as ClaimVerifyResult;
+    } catch (error) {
+      return { isValid: false, userId: '' } as ClaimVerifyResult;
+    }
   }
 }

@@ -12,7 +12,7 @@ import {
 } from '@libs/api-gateway';
 import AuthService from '@core/services/auth';
 import ApiGatewayService from '@core/services/api-gateway.service';
-import { CommonAction } from '@core/constants';
+import { CommonAction, ERROR_MESSAGES } from '@core/constants';
 import { ConnectionService } from '@services/connection.service';
 import { ChatService } from '@services/chat.service';
 
@@ -23,13 +23,12 @@ export const authHandler: APIGatewayRequestAuthorizerHandler = async (
     methodArn,
     queryStringParameters: { token },
   } = event;
-
-  if (!token) throw Error('Unauthorized');
+  if (!token) throw Error(ERROR_MESSAGES.UNAUTHORIZED);
 
   const authService = AuthService.getInstance();
   const payload = await authService.verifyToken(token);
   const { isValid, userId } = payload;
-  if (!isValid) throw Error('Unauthorized');
+  if (!isValid) throw Error(ERROR_MESSAGES.UNAUTHORIZED);
 
   return generateAllow(userId, methodArn);
 };
